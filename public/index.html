@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Online - Manajemen Produk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="bi bi-cart3 me-2"></i>Toko Online</a>
+            <div class="navbar-nav ms-auto" id="authButtons">
+                <button class="btn btn-light btn-sm me-2" onclick="showLoginModal()">Login</button>
+                <button class="btn btn-outline-light btn-sm" onclick="showRegisterModal()">Register</button>
+            </div>
+            <div class="navbar-nav ms-auto d-none" id="userInfo">
+                <button class="btn btn-outline-light btn-sm me-2" onclick="openCartModal()">
+                    <i class="bi bi-cart3"></i> Keranjang <span class="badge bg-danger" id="cartCount">0</span>
+                </button>
+                <button class="btn btn-outline-light btn-sm me-2" onclick="openProfileModal()">
+                    <i class="bi bi-person"></i> Profil
+                </button>
+                <button class="btn btn-outline-light btn-sm me-2" onclick="openOrderHistoryModal()">
+                    <i class="bi bi-clock-history"></i> Pesanan
+                </button>
+                <button class="btn btn-outline-light btn-sm me-2 d-none" id="adminDashboardBtn" onclick="window.location.href='/admin.html'">
+                    <i class="bi bi-speedometer2"></i> Admin
+                </button>
+                <span class="navbar-text me-3">
+                    <i class="bi bi-person-circle me-1"></i>
+                    <span id="username"></span>
+                    <span class="badge bg-secondary ms-1" id="userRole"></span>
+                </span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h1 class="h3 mb-0">Manajemen Produk</h1>
+            </div>
+            
+            <div class="card-body">
+                <div id="adminControls" class="d-none">
+                    <button class="btn btn-primary mb-3 me-2" onclick="openModal()">
+                        <i class="bi bi-plus-lg me-1"></i> Tambah Produk
+                    </button>
+                    <button class="btn btn-secondary mb-3" onclick="openCategoryModal()">
+                        <i class="bi bi-tags me-1"></i> Kelola Kategori
+                    </button>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Cari produk..." oninput="filterProducts()">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="categoryFilter" onchange="filterProducts()">
+                            <option value="">Semua Kategori</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="error" class="alert alert-danger d-none"></div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Gambar</th>
+                                <th>ID</th>
+                                <th>Nama Produk</th>
+                                <th>Deskripsi</th>
+                                <th>Kategori</th>
+                                <th>Harga</th>
+                                <th>Stok</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTable">
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Memuat...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalTitle">Tambah Produk</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <input type="hidden" id="productId">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama Produk</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Deskripsi</label>
+                            <textarea class="form-control" id="description" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Harga</label>
+                            <input type="number" class="form-control" id="price" required min="0" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="stock" class="form-label">Stok</label>
+                            <input type="number" class="form-control" id="stock" required min="0">
+                        </div>
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label">Kategori</label>
+                            <select class="form-select" id="category_id" required>
+                                <option value="">Pilih Kategori</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Gambar Produk</label>
+                            <input type="file" class="form-control" id="image" accept="image/*">
+                            <div id="imagePreview" class="mt-2"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="submitForm()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Login</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeLoginModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="loginUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="loginUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeLoginModal()">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="handleLogin()">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="registerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Register</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeRegisterModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="registerUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="registerUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="registerPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerRole" class="form-label">Role</label>
+                            <select class="form-select" id="registerRole">
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="handleRegister()">Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="categoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Kelola Kategori</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeCategoryModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="categoryForm">
+                        <input type="hidden" id="categoryId">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Nama Kategori</label>
+                            <input type="text" class="form-control" id="categoryName" required>
+                        </div>
+                    </form>
+                    <hr>
+                    <h6>Kategori yang ada:</h6>
+                    <div id="categoryList" class="mt-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Memuat...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeCategoryModal()">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="submitCategory()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Keranjang Belanja</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeCartModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cartItems">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Memuat...</span>
+                        </div>
+                    </div>
+                    <div id="cartEmpty" class="text-center py-5 d-none">
+                        <i class="bi bi-cart-x fs-1 d-block mb-2 text-muted"></i>
+                        <h5 class="text-muted">Keranjang kosong</h5>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <div>
+                        <strong>Total: Rp <span id="cartTotal">0</span></strong>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-secondary me-2" onclick="closeCartModal()">Tutup</button>
+                        <button type="button" class="btn btn-success" onclick="checkout()">Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Pesanan Berhasil</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeOrderModal()"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-check-circle fs-1 text-success d-block mb-3"></i>
+                    <h5>Pesanan Anda berhasil dibuat!</h5>
+                    <p class="text-muted mb-0">Nomor Pesanan: <strong id="orderNumber">#</strong></p>
+                    <p class="text-muted">Total: Rp <span id="orderTotal">0</span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="closeOrderModal()">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Profil Pengguna</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeProfileModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-3" id="profileTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profileInfo">Info Profil</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#editProfile">Edit Profil</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#changePassword">Ganti Password</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="profileInfo">
+                            <div id="profileData">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Memuat...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="editProfile">
+                            <form id="editProfileForm">
+                                <div class="mb-3">
+                                    <label for="editUsername" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="editUsername" required>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="updateProfile()">Simpan</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="changePassword">
+                            <form id="changePasswordForm">
+                                <div class="mb-3">
+                                    <label for="oldPassword" class="form-label">Password Lama</label>
+                                    <input type="password" class="form-control" id="oldPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label">Password Baru</label>
+                                    <input type="password" class="form-control" id="newPassword" required>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="changePassword()">Ganti Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeProfileModal()">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderHistoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Riwayat Pesanan</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeOrderHistoryModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="orderHistoryList">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Memuat...</span>
+                        </div>
+                    </div>
+                    <div id="orderHistoryEmpty" class="text-center py-5 d-none">
+                        <i class="bi bi-inbox fs-1 d-block mb-2 text-muted"></i>
+                        <h5 class="text-muted">Belum ada pesanan</h5>
+                    </div>
+                    <div id="orderDetails" class="d-none">
+                        <button class="btn btn-sm btn-secondary mb-3" onclick="backToOrderList()">
+                            <i class="bi bi-arrow-left"></i> Kembali
+                        </button>
+                        <div id="orderDetailsContent"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeOrderHistoryModal()">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = '/products';
+        const AUTH_URL = '/auth';
+        const CATEGORY_URL = '/categories';
+        const CART_URL = '/cart';
+        const ORDER_URL = '/orders';
+        let isEditing = false;
+        let modal, loginModal, registerModal, categoryModal, cartModal, orderModal, profileModal, orderHistoryModal;
+        let currentUser = null;
+        let token = localStorage.getItem('token');
+        let categories = [];
+        let allProducts = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            modal = new bootstrap.Modal(document.getElementById('productModal'));
+            loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+            categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
+            cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
+            orderModal = new bootstrap.Modal(document.getElementById('orderModal'));
+            profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+            orderHistoryModal = new bootstrap.Modal(document.getElementById('orderHistoryModal'));
+            
+            checkAuth();
+            loadCategories();
+            loadProducts();
+            loadCart();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                currentUser = user;
+                updateAuthUI();
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch(CATEGORY_URL);
+                const data = await response.json();
+                categories = data;
+                
+                const categorySelect = document.getElementById('category_id');
+                categorySelect.innerHTML = '<option value="">Pilih Kategori</option>';
+                categories.forEach(cat => {
+                    categorySelect.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+                });
+                
+                const categoryFilter = document.getElementById('categoryFilter');
+                categoryFilter.innerHTML = '<option value="">Semua Kategori</option>';
+                categories.forEach(cat => {
+                    categoryFilter.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+                });
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        function openCategoryModal() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = '';
+            loadCategoryList();
+            categoryModal.show();
+        }
+
+        function closeCategoryModal() {
+            categoryModal.hide();
+        }
+
+        async function loadCategoryList() {
+            try {
+                const response = await fetch(CATEGORY_URL);
+                const data = await response.json();
+                
+                const categoryList = document.getElementById('categoryList');
+                if (data.length === 0) {
+                    categoryList.innerHTML = '<p class="text-muted">Belum ada kategori</p>';
+                    return;
+                }
+                
+                categoryList.innerHTML = data.map(cat => `
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                        <span>${cat.name}</span>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editCategory(${cat.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${cat.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading category list:', error);
+            }
+        }
+
+        async function submitCategory() {
+            const categoryId = document.getElementById('categoryId').value;
+            const categoryName = document.getElementById('categoryName').value;
+
+            if (!categoryName) {
+                showError('Nama kategori wajib diisi');
+                return;
+            }
+
+            try {
+                let response;
+                if (categoryId) {
+                    response = await fetch(`${CATEGORY_URL}/${categoryId}`, {
+                        method: 'PUT',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({ name: categoryName })
+                    });
+                } else {
+                    response = await fetch(CATEGORY_URL, {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({ name: categoryName })
+                    });
+                }
+
+                if (response.ok) {
+                    loadCategories();
+                    loadCategoryList();
+                    document.getElementById('categoryForm').reset();
+                    document.getElementById('categoryId').value = '';
+                    showSuccess('Kategori berhasil disimpan');
+                } else {
+                    showError('Gagal menyimpan kategori');
+                }
+            } catch (error) {
+                showError('Gagal menyimpan kategori');
+                console.error('Error:', error);
+            }
+        }
+
+        async function editCategory(id) {
+            try {
+                const response = await fetch(`${CATEGORY_URL}/${id}`);
+                const category = await response.json();
+                
+                document.getElementById('categoryId').value = category.id;
+                document.getElementById('categoryName').value = category.name;
+            } catch (error) {
+                showError('Gagal memuat kategori');
+                console.error('Error:', error);
+            }
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus kategori ini?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${CATEGORY_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+
+                if (response.ok) {
+                    loadCategories();
+                    loadCategoryList();
+                    showSuccess('Kategori berhasil dihapus');
+                } else {
+                    showError('Gagal menghapus kategori');
+                }
+            } catch (error) {
+                showError('Gagal menghapus kategori');
+                console.error('Error:', error);
+            }
+        }
+
+        function updateAuthUI() {
+            const authButtons = document.getElementById('authButtons');
+            const userInfo = document.getElementById('userInfo');
+            const adminControls = document.getElementById('adminControls');
+            const adminDashboardBtn = document.getElementById('adminDashboardBtn');
+
+            if (currentUser) {
+                authButtons.classList.add('d-none');
+                userInfo.classList.remove('d-none');
+                document.getElementById('username').textContent = currentUser.username;
+                document.getElementById('userRole').textContent = currentUser.role;
+                
+                if (currentUser.role === 'admin') {
+                    adminControls.classList.remove('d-none');
+                    adminDashboardBtn.classList.remove('d-none');
+                } else {
+                    adminControls.classList.add('d-none');
+                    adminDashboardBtn.classList.add('d-none');
+                }
+            } else {
+                authButtons.classList.remove('d-none');
+                userInfo.classList.add('d-none');
+                adminControls.classList.add('d-none');
+                adminDashboardBtn.classList.add('d-none');
+            }
+        }
+
+        function showLoginModal() {
+            loginModal.show();
+        }
+
+        function closeLoginModal() {
+            loginModal.hide();
+        }
+
+        function showRegisterModal() {
+            registerModal.show();
+        }
+
+        function closeRegisterModal() {
+            registerModal.hide();
+        }
+
+        async function handleLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                showError('Username dan password wajib diisi');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${AUTH_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    token = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    closeLoginModal();
+                    updateAuthUI();
+                    loadProducts();
+                } else {
+                    showError(data.message || 'Login gagal');
+                }
+            } catch (error) {
+                showError('Login gagal');
+                console.error('Error:', error);
+            }
+        }
+
+        async function handleRegister() {
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const role = document.getElementById('registerRole').value;
+
+            if (!username || !password) {
+                showError('Username dan password wajib diisi');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${AUTH_URL}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password, role })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    closeRegisterModal();
+                    showError('Registrasi berhasil! Silakan login.', 'success');
+                } else {
+                    showError(data.message || 'Registrasi gagal');
+                }
+            } catch (error) {
+                showError('Registrasi gagal');
+                console.error('Error:', error);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            token = null;
+            currentUser = null;
+            updateAuthUI();
+            loadProducts();
+        }
+
+        function getAuthHeaders() {
+            if (token) {
+                return {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+            }
+            return {
+                'Content-Type': 'application/json'
+            };
+        }
+
+        async function loadProducts() {
+            try {
+                const response = await fetch(API_URL);
+                const products = await response.json();
+                
+                allProducts = products;
+                displayProducts(products);
+            } catch (error) {
+                showError('Gagal memuat data produk');
+                console.error('Error:', error);
+            }
+        }
+
+        function displayProducts(products) {
+            const tableBody = document.getElementById('productTable');
+            
+            if (products.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            <h5>Tidak ada produk ditemukan</h5>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tableBody.innerHTML = products.map(product => `
+                <tr>
+                    <td>
+                        ${product.image ? 
+                            `<img src="/uploads/products/${product.image}" alt="${product.name}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">` : 
+                            '<div class="bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="bi bi-image text-white"></i></div>'
+                        }
+                    </td>
+                    <td>${product.id}</td>
+                    <td><strong>${product.name}</strong></td>
+                    <td>${product.description}</td>
+                    <td><span class="badge bg-info">${product.category_name || 'Uncategorized'}</span></td>
+                    <td>Rp ${parseFloat(product.price).toLocaleString('id-ID')}</td>
+                    <td>${product.stock}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary me-1" onclick="addToCart(${product.id})">
+                            <i class="bi bi-cart-plus"></i> Add
+                        </button>
+                        ${currentUser && currentUser.role === 'admin' ? `
+                        <button class="btn btn-sm btn-success me-1" onclick="editProduct(${product.id})">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">
+                            <i class="bi bi-trash"></i> Hapus
+                        </button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            
+            const filteredProducts = allProducts.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                                     product.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = !categoryFilter || product.category_id == categoryFilter;
+                
+                return matchesSearch && matchesCategory;
+            });
+            
+            displayProducts(filteredProducts);
+        }
+
+        function openModal() {
+            isEditing = false;
+            document.getElementById('modalTitle').textContent = 'Tambah Produk';
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('imagePreview').innerHTML = '';
+            modal.show();
+        }
+
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').innerHTML = 
+                        `<img src="${e.target.result}" class="img-thumbnail" style="max-width: 200px;">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').innerHTML = '';
+            }
+        });
+
+        function closeModal() {
+            modal.hide();
+        }
+
+        async function editProduct(id) {
+            try {
+                const response = await fetch(`${API_URL}/${id}`);
+                const product = await response.json();
+                
+                isEditing = true;
+                document.getElementById('modalTitle').textContent = 'Edit Produk';
+                document.getElementById('productId').value = product.id;
+                document.getElementById('name').value = product.name;
+                document.getElementById('description').value = product.description;
+                document.getElementById('price').value = product.price;
+                document.getElementById('stock').value = product.stock;
+                document.getElementById('category_id').value = product.category_id || 1;
+                
+                if (product.image) {
+                    document.getElementById('imagePreview').innerHTML = 
+                        `<img src="/uploads/products/${product.image}" class="img-thumbnail" style="max-width: 200px;">`;
+                } else {
+                    document.getElementById('imagePreview').innerHTML = '';
+                }
+                
+                modal.show();
+            } catch (error) {
+                showError('Gagal memuat data produk');
+                console.error('Error:', error);
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                
+                if (response.ok) {
+                    loadProducts();
+                } else {
+                    showError('Gagal menghapus produk');
+                }
+            } catch (error) {
+                showError('Gagal menghapus produk');
+                console.error('Error:', error);
+            }
+        }
+
+        async function submitForm() {
+            const form = document.getElementById('productForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('price', parseFloat(document.getElementById('price').value));
+            formData.append('stock', parseInt(document.getElementById('stock').value));
+            formData.append('category_id', parseInt(document.getElementById('category_id').value));
+            
+            const imageInput = document.getElementById('image');
+            if (imageInput.files[0]) {
+                formData.append('image', imageInput.files[0]);
+            }
+            
+            try {
+                let response;
+                if (isEditing) {
+                    const id = document.getElementById('productId').value;
+                    response = await fetch(`${API_URL}/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+                } else {
+                    response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+                }
+                
+                if (response.ok) {
+                    closeModal();
+                    loadProducts();
+                } else {
+                    showError(isEditing ? 'Gagal mengupdate produk' : 'Gagal menambah produk');
+                }
+            } catch (error) {
+                showError(isEditing ? 'Gagal mengupdate produk' : 'Gagal menambah produk');
+                console.error('Error:', error);
+            }
+        }
+
+        function showError(message, type = 'danger') {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.className = `alert alert-${type}`;
+            errorDiv.classList.remove('d-none');
+            setTimeout(() => {
+                errorDiv.classList.add('d-none');
+            }, 3000);
+        }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.className = 'alert alert-success';
+            errorDiv.classList.remove('d-none');
+            setTimeout(() => {
+                errorDiv.classList.add('d-none');
+            }, 3000);
+        }
+
+        function openCartModal() {
+            loadCart();
+            cartModal.show();
+        }
+
+        function closeCartModal() {
+            cartModal.hide();
+        }
+
+        async function loadCart() {
+            try {
+                const response = await fetch(CART_URL, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const cartItems = await response.json();
+                
+                const cartItemsDiv = document.getElementById('cartItems');
+                const cartEmptyDiv = document.getElementById('cartEmpty');
+                const cartCount = document.getElementById('cartCount');
+                const cartTotal = document.getElementById('cartTotal');
+                
+                if (cartItems.length === 0) {
+                    cartItemsDiv.classList.add('d-none');
+                    cartEmptyDiv.classList.remove('d-none');
+                    cartCount.textContent = '0';
+                    cartTotal.textContent = '0';
+                    return;
+                }
+                
+                cartItemsDiv.classList.remove('d-none');
+                cartEmptyDiv.classList.add('d-none');
+                cartCount.textContent = cartItems.length;
+                
+                let total = 0;
+                cartItemsDiv.innerHTML = cartItems.map(item => {
+                    total += item.price * item.quantity;
+                    return `
+                        <div class="d-flex align-items-center mb-3 p-2 border rounded">
+                            ${item.image ? 
+                                `<img src="/uploads/products/${item.image}" alt="${item.name}" class="img-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;">` : 
+                                '<div class="bg-secondary d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;"><i class="bi bi-image text-white"></i></div>'
+                            }
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">${item.name}</h6>
+                                <p class="mb-0 text-muted">Rp ${parseFloat(item.price).toLocaleString('id-ID')} x ${item.quantity}</p>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <button class="btn btn-sm btn-outline-secondary me-1" onclick="updateCartItem(${item.id}, ${item.quantity - 1})">-</button>
+                                <span class="mx-2">${item.quantity}</span>
+                                <button class="btn btn-sm btn-outline-secondary me-1" onclick="updateCartItem(${item.id}, ${item.quantity + 1})">+</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="removeCartItem(${item.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                cartTotal.textContent = total.toLocaleString('id-ID');
+            } catch (error) {
+                console.error('Error loading cart:', error);
+            }
+        }
+
+        async function addToCart(productId) {
+            try {
+                const response = await fetch(CART_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ product_id: productId, quantity: 1 })
+                });
+
+                if (response.ok) {
+                    showSuccess('Produk ditambahkan ke keranjang');
+                    loadCart();
+                } else {
+                    showError('Gagal menambah ke keranjang');
+                }
+            } catch (error) {
+                showError('Gagal menambah ke keranjang');
+                console.error('Error:', error);
+            }
+        }
+
+        async function updateCartItem(itemId, quantity) {
+            if (quantity < 1) {
+                removeCartItem(itemId);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${CART_URL}/${itemId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ quantity })
+                });
+
+                if (response.ok) {
+                    loadCart();
+                } else {
+                    showError('Gagal mengupdate keranjang');
+                }
+            } catch (error) {
+                showError('Gagal mengupdate keranjang');
+                console.error('Error:', error);
+            }
+        }
+
+        async function removeCartItem(itemId) {
+            if (!confirm('Hapus item dari keranjang?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${CART_URL}/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    loadCart();
+                } else {
+                    showError('Gagal menghapus item');
+                }
+            } catch (error) {
+                showError('Gagal menghapus item');
+                console.error('Error:', error);
+            }
+        }
+
+        async function checkout() {
+            try {
+                const response = await fetch(`${CART_URL}/checkout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    closeCartModal();
+                    document.getElementById('orderNumber').textContent = `#${data.orderId}`;
+                    document.getElementById('orderTotal').textContent = data.total.toLocaleString('id-ID');
+                    orderModal.show();
+                    loadCart();
+                    loadProducts();
+                } else {
+                    showError(data.message || 'Gagal melakukan checkout');
+                }
+            } catch (error) {
+                showError('Gagal melakukan checkout');
+                console.error('Error:', error);
+            }
+        }
+
+        function closeOrderModal() {
+            orderModal.hide();
+        }
+
+        function openProfileModal() {
+            loadProfile();
+            profileModal.show();
+        }
+
+        function closeProfileModal() {
+            profileModal.hide();
+        }
+
+        async function loadProfile() {
+            try {
+                const response = await fetch(`${AUTH_URL}/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const profile = await response.json();
+                
+                const profileData = document.getElementById('profileData');
+                profileData.innerHTML = `
+                    <table class="table">
+                        <tr>
+                            <td><strong>ID:</strong></td>
+                            <td>${profile.id}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Username:</strong></td>
+                            <td>${profile.username}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Role:</strong></td>
+                            <td><span class="badge bg-info">${profile.role}</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tanggal Dibuat:</strong></td>
+                            <td>${new Date(profile.created_at).toLocaleDateString('id-ID')}</td>
+                        </tr>
+                    </table>
+                `;
+                
+                document.getElementById('editUsername').value = profile.username;
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        async function updateProfile() {
+            const username = document.getElementById('editUsername').value;
+            
+            if (!username) {
+                showError('Username wajib diisi');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${AUTH_URL}/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username })
+                });
+
+                if (response.ok) {
+                    showSuccess('Profil berhasil diupdate');
+                    loadProfile();
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    user.username = username;
+                    localStorage.setItem('user', JSON.stringify(user));
+                    document.getElementById('username').textContent = username;
+                } else {
+                    const data = await response.json();
+                    showError(data.message || 'Gagal mengupdate profil');
+                }
+            } catch (error) {
+                showError('Gagal mengupdate profil');
+                console.error('Error:', error);
+            }
+        }
+
+        async function changePassword() {
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            
+            if (!oldPassword || !newPassword) {
+                showError('Password lama dan baru wajib diisi');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${AUTH_URL}/change-password`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ oldPassword, newPassword })
+                });
+
+                if (response.ok) {
+                    showSuccess('Password berhasil diganti');
+                    document.getElementById('oldPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                } else {
+                    const data = await response.json();
+                    showError(data.message || 'Gagal mengganti password');
+                }
+            } catch (error) {
+                showError('Gagal mengganti password');
+                console.error('Error:', error);
+            }
+        }
+
+        function openOrderHistoryModal() {
+            loadOrderHistory();
+            orderHistoryModal.show();
+        }
+
+        function closeOrderHistoryModal() {
+            orderHistoryModal.hide();
+        }
+
+        async function loadOrderHistory() {
+            try {
+                const response = await fetch(ORDER_URL, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const orders = await response.json();
+                
+                const orderHistoryList = document.getElementById('orderHistoryList');
+                const orderHistoryEmpty = document.getElementById('orderHistoryEmpty');
+                const orderDetails = document.getElementById('orderDetails');
+                
+                orderDetails.classList.add('d-none');
+                orderHistoryList.classList.remove('d-none');
+                
+                if (orders.length === 0) {
+                    orderHistoryList.classList.add('d-none');
+                    orderHistoryEmpty.classList.remove('d-none');
+                    return;
+                }
+                
+                orderHistoryList.classList.remove('d-none');
+                orderHistoryEmpty.classList.add('d-none');
+                
+                const uniqueOrders = {};
+                orders.forEach(order => {
+                    if (!uniqueOrders[order.id]) {
+                        uniqueOrders[order.id] = {
+                            id: order.id,
+                            status: order.status,
+                            total: order.total,
+                            created_at: order.created_at,
+                            items: []
+                        };
+                    }
+                    uniqueOrders[order.id].items.push({
+                        product_id: order.product_id,
+                        product_name: order.product_name,
+                        quantity: order.quantity,
+                        item_price: order.item_price,
+                        image: order.image
+                    });
+                });
+                
+                const orderArray = Object.values(uniqueOrders).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                
+                orderHistoryList.innerHTML = orderArray.map(order => {
+                    const statusColors = {
+                        pending: 'warning',
+                        paid: 'info',
+                        shipped: 'primary',
+                        completed: 'success',
+                        cancelled: 'danger'
+                    };
+                    const statusLabels = {
+                        pending: 'Pending',
+                        paid: 'Dibayar',
+                        shipped: 'Dikirim',
+                        completed: 'Selesai',
+                        cancelled: 'Dibatalkan'
+                    };
+                    
+                    return `
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Pesanan #${order.id}</h6>
+                                        <p class="mb-0 text-muted">${new Date(order.created_at).toLocaleDateString('id-ID')}</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-${statusColors[order.status]}">${statusLabels[order.status]}</span>
+                                        <p class="mb-0 mt-1">Rp ${parseFloat(order.total).toLocaleString('id-ID')}</p>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary mt-2" onclick="viewOrderDetails(${order.id})">
+                                    <i class="bi bi-eye"></i> Lihat Detail
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading order history:', error);
+            }
+        }
+
+        async function viewOrderDetails(orderId) {
+            try {
+                const response = await fetch(`${ORDER_URL}/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const orderItems = await response.json();
+                
+                const orderHistoryList = document.getElementById('orderHistoryList');
+                const orderDetails = document.getElementById('orderDetails');
+                const orderDetailsContent = document.getElementById('orderDetailsContent');
+                
+                orderHistoryList.classList.add('d-none');
+                orderDetails.classList.remove('d-none');
+                
+                const order = orderItems[0];
+                const statusColors = {
+                    pending: 'warning',
+                    paid: 'info',
+                    shipped: 'primary',
+                    completed: 'success',
+                    cancelled: 'danger'
+                };
+                const statusLabels = {
+                    pending: 'Pending',
+                    paid: 'Dibayar',
+                    shipped: 'Dikirim',
+                    completed: 'Selesai',
+                    cancelled: 'Dibatalkan'
+                };
+                
+                orderDetailsContent.innerHTML = `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5>Pesanan #${order.id}</h5>
+                            <p class="mb-1"><strong>Status:</strong> <span class="badge bg-${statusColors[order.status]}">${statusLabels[order.status]}</span></p>
+                            <p class="mb-1"><strong>Tanggal:</strong> ${new Date(order.created_at).toLocaleDateString('id-ID')}</p>
+                            <p class="mb-0"><strong>Total:</strong> Rp ${parseFloat(order.total).toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                    <h6>Item Pesanan:</h6>
+                    ${orderItems.map(item => `
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    ${item.image ? 
+                                        `<img src="/uploads/products/${item.image}" alt="${item.product_name}" class="img-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;">` : 
+                                        '<div class="bg-secondary d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;"><i class="bi bi-image text-white"></i></div>'
+                                    }
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">${item.product_name}</h6>
+                                        <p class="mb-0 text-muted">Rp ${parseFloat(item.item_price).toLocaleString('id-ID')} x ${item.quantity}</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <strong>Rp ${(parseFloat(item.item_price) * item.quantity).toLocaleString('id-ID')}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+            } catch (error) {
+                console.error('Error loading order details:', error);
+            }
+        }
+
+        function backToOrderList() {
+            document.getElementById('orderHistoryList').classList.remove('d-none');
+            document.getElementById('orderDetails').classList.add('d-none');
+        }
+    </script>
+</body>
+</html>
