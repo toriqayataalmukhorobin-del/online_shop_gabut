@@ -1,266 +1,149 @@
-# Toko Online API
+# 🛍️ API Toko Online (E-Commerce)
 
-A full-stack e-commerce application built with Node.js, Express, MySQL, and Bootstrap 5.
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=24&pause=1000&color=36BCF7&center=true&vCenter=true&width=700&lines=Aplikasi+E-Commerce+Full-Stack;Dibangun+dengan+Node.js+%26+Express;Sistem+Autentikasi+JWT+%26+Role+Access" alt="Typing SVG" />
+</p>
 
-## Features
+<p align="center">
+  <img src="https://img.shields.io/badge/Backend-Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Framework-Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
+  <img src="https://img.shields.io/badge/Status-Completed-success?style=for-the-badge" alt="Status" />
+</p>
 
-- **Product Management**: Create, read, update, delete products with image upload
-- **Category Management**: Organize products into categories
-- **Cart System**: Add products to cart, manage quantities, calculate totals
-- **Checkout System**: Complete orders with automatic stock reduction
-- **User Authentication**: JWT-based authentication with role-based access (admin/user)
-- **User Profile**: View and update user profile, change password
-- **Order History**: View past orders and order details
-- **Admin Dashboard**: Sales statistics, order management, user management
-- **Search & Filter**: Search products by name/description, filter by category
+---
 
-## Tech Stack
+### 📝 Tentang Proyek
 
-- **Backend**: Node.js, Express.js
-- **Database**: MySQL
-- **Frontend**: Bootstrap 5, Vanilla JavaScript
-- **Authentication**: JWT (JSON Web Tokens)
-- **File Upload**: Multer
-- **Password Hashing**: bcryptjs
+Aplikasi ini adalah **Platform E-Commerce Full-Stack** siap pakai yang mengintegrasikan sistem backend berbasis RESTful API dengan antarmuka frontend yang responsif. Menggunakan Node.js sebagai penggerak utama dan MySQL untuk manajemen data relasional, sistem ini dirancang untuk menangani transaksi toko online mulai dari manajemen produk hingga proses *checkout* pesanan secara otomatis.
 
-## Prerequisites
+---
 
-- Node.js (v14 or higher)
-- MySQL (v5.7 or higher)
-- npm or yarn
+### 🚀 Fitur Utama Aplikasi
 
-## Installation
+- 📦 **Manajemen Produk & Kategori:** Operasi CRUD lengkap untuk produk (termasuk unggah gambar) dan pengelompokan kategori.
+- 🛒 **Sistem Keranjang & Checkout:** Menambah produk ke keranjang, memperbarui kuantitas, kalkulasi total harga otomatis, dan pengurangan stok produk saat checkout.
+- 🔐 **Autentikasi Pengguna (JWT):** Registrasi dan login aman menggunakan enkripsi token JWT dengan pembagian hak akses (*Role-based*) antara Admin dan User biasa.
+- 📊 **Dashboard Admin & Riwayat:** Halaman khusus admin untuk memantau statistik penjualan serta halaman pengguna untuk melihat riwayat pesanan.
+- 🔍 **Pencarian & Filter:** Menemukan produk berdasarkan nama atau deskripsi, serta memfilter barang berdasarkan kategori terkait.
 
-1. Clone the repository:
+---
+
+### 🛠️ Kebutuhan Sistem (Tech Stack)
+
+<p align="left">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=nodejs,express,mysql,bootstrap,js,vscode&theme=dark" />
+  </a>
+</p>
+
+| Komponen | Teknologi & Pustaka | Kegunaan |
+| :--- | :--- | :--- |
+| **Backend** | Node.js / Express.js | Kerangka kerja server dan routing RESTful API. |
+| **Database** | MySQL | Penyimpanan data relasional (User, Produk, Transaksi). |
+| **Frontend** | Bootstrap 5 / Vanilla JS | Desain antarmuka responsif tanpa framework berat. |
+| **Keamanan** | JWT & Bcryptjs | Pembuatan token sesi dan hashing password user. |
+| **Media** | Multer | Menangani proses unggah berkas gambar produk. |
+
+---
+
+## 💻 Panduan Cara Pemasangan (Lokal)
+
+Ikuti langkah-langkah di bawah ini secara berurutan untuk menjalankan aplikasi di komputer kamu:
+
+### 1. Unduh (Clone) Repositori
+Buka terminal atau CMD, lalu jalankan perintah berikut:
 ```bash
 git clone <repository-url>
 cd toko-online-api
-```
 
-2. Install dependencies:
+```
+### 2. Pasang Package Dependency
+Pasang seluruh pustaka (*library*) Node.js yang tercantum pada file package.json:
 ```bash
 npm install
-```
 
-3. Set up environment variables:
+```
+### 3. Konfigurasi Environment File (.env)
+Salin berkas template lingkungan bawaan untuk membuat konfigurasi baru:
 ```bash
 cp .env.example .env
-```
 
-Edit `.env` file with your configuration:
 ```
+Buka file .env baru tersebut menggunakan text editor (seperti VS Code) lalu isi nilai konfigurasinya sesuai database lokal kamu:
+```env
 DB_HOST=localhost
-DB_USER=your_mysql_user
-DB_PASSWORD=your_mysql_password
+DB_USER=root
+DB_PASSWORD=
 DB_NAME=toko_online
-JWT_SECRET=your_jwt_secret_key
+JWT_SECRET=kunci_rahasia_jwt_kamu
 PORT=3000
-```
 
-4. Create the database:
-```bash
-mysql -u your_mysql_user -p
 ```
-
-Run the SQL commands:
+> ⚠️ **CATATAN:** Pastikan aplikasi **XAMPP** (Apache & MySQL) atau server MySQL mandiri milikmu sudah aktif sebelum melangkah ke tahap berikutnya.
+> 
+### 4. Membuat Database Lokal
+Masuk ke terminal MySQL atau buka localhost/phpmyadmin di browser, lalu buat database baru:
 ```sql
 CREATE DATABASE toko_online;
-USE toko_online;
-SOURCE database-schema.sql;
-```
 
-Or run the schema file directly:
+```
+Setelah database dibuat, import struktur tabel menggunakan file schema yang sudah disediakan melalui terminal:
 ```bash
-mysql -u your_mysql_user -p toko_online < database-schema.sql
-```
+mysql -u root -p toko_online < database-schema.sql
 
-5. Start the application:
+```
+### 5. Jalankan Aplikasi
+Nyalakan server development lokal menggunakan perintah:
 ```bash
 npm start
-```
-
-The application will be available at `http://localhost:3000`
-
-## Database Schema
-
-The application uses the following tables:
-
-- `users`: User accounts with authentication
-- `categories`: Product categories
-- `products`: Product information with images
-- `carts`: Shopping carts for each user
-- `cart_items`: Items in shopping carts
-- `orders`: Customer orders
-- `order_items`: Items in orders
-
-## API Endpoints
-
-### Authentication
-- `POST /auth/register` - Register a new user
-- `POST /auth/login` - Login user
-- `GET /auth/profile` - Get user profile (authenticated)
-- `PUT /auth/profile` - Update user profile (authenticated)
-- `PUT /auth/change-password` - Change password (authenticated)
-
-### Products
-- `GET /products` - Get all products
-- `POST /products` - Create product (admin only)
-- `PUT /products/:id` - Update product (admin only)
-- `DELETE /products/:id` - Delete product (admin only)
-
-### Categories
-- `GET /categories` - Get all categories
-- `POST /categories` - Create category (admin only)
-- `PUT /categories/:id` - Update category (admin only)
-- `DELETE /categories/:id` - Delete category (admin only)
-
-### Cart
-- `GET /cart` - Get user's cart
-- `POST /cart` - Add item to cart
-- `PUT /cart/items/:id` - Update cart item quantity
-- `DELETE /cart/items/:id` - Remove item from cart
-- `DELETE /cart` - Clear cart
-- `POST /cart/checkout` - Checkout cart
-
-### Orders
-- `GET /orders` - Get user's orders
-- `GET /orders/:id` - Get order details
-- `PUT /orders/:id/status` - Update order status (admin only)
-- `GET /orders/all/orders` - Get all orders (admin only)
-
-## Default Users
-
-After running the schema, you can create users through the registration page. The first user will have admin privileges if you manually set the role in the database.
-
-To create an admin user manually:
-```sql
-INSERT INTO users (username, password, role) 
-VALUES ('admin', '$2a$10$hashed_password_here', 'admin');
-```
-
-## File Structure
 
 ```
+Buka browser favoritmu dan akses tautan: 👉 **http://localhost:3000**
+## 📁 Struktur Dokumen Utama
+```text
 toko-online-api/
-├── public/
-│   ├── index.html          # Main application page
-│   ├── login.html          # Login page
-│   ├── register.html       # Registration page
-│   └── uploads/            # Uploaded product images
-├── src/
-│   ├── config/
-│   │   └── database.js     # Database configuration
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── cartController.js
-│   │   ├── categoryController.js
-│   │   ├── orderController.js
-│   │   └── productController.js
-│   ├── middleware/
-│   │   ├── auth.js         # Authentication middleware
-│   │   └── upload.js       # Multer configuration
-│   └── routes/
-│       ├── authRoutes.js
-│       ├── cartRoutes.js
-│       ├── categoryRoutes.js
-│       ├── orderRoutes.js
-│       └── productRoutes.js
-├── database-schema.sql     # Database schema
-├── index.js                # Main application file
-├── package.json
-└── .env                    # Environment variables
+├── public/                 # File statis frontend (HTML, CSS, JS)
+│   ├── index.html          # Halaman katalog utama
+│   ├── login.html          # Halaman masuk log
+│   └── uploads/            # Tempat penyimpanan gambar produk hasil upload
+├── src/                    # Source code utama aplikasi backend
+│   ├── config/             # Pengaturan koneksi database MySQL
+│   ├── controllers/        # Logika bisnis penanganan request (Auth, Cart, Product)
+│   ├── middleware/         # Validasi token keamanan dan konfigurasi Multer
+│   └── routes/             # Pemetaan endpoint rute URL API
+├── database-schema.sql     # Skrip SQL untuk struktur tabel database
+└── index.js                # Berkas utama entry-point aplikasi server
+
 ```
-
-## Development
-
-### Running in development mode
+## 📡 Daftar Endpoint API Utama
+### Autentikasi Pengguna
+ * POST /auth/register - Mendaftarkan akun pengguna baru.
+ * POST /auth/login - Melakukan masuk log untuk mendapatkan token JWT.
+ * GET /auth/profile - Mengambil informasi profil pengguna yang sedang login.
+### Produk & Kategori
+ * GET /products - Menampilkan seluruh daftar produk toko.
+ * POST /products - Menambahkan produk baru ke sistem (*Khusus Admin*).
+ * PUT /products/:id - Memperbarui data produk berdasarkan ID (*Khusus Admin*).
+ * DELETE /products/:id - Menghapus produk dari sistem (*Khusus Admin*).
+### Keranjang & Transaksi
+ * GET /cart - Melihat isi keranjang belanja pengguna.
+ * POST /cart - Memasukkan produk pilihan ke dalam keranjang.
+ * POST /cart/checkout - Melakukan proses checkout untuk menerbitkan pesanan baru.
+## 🛠️ Panduan Pengembangan Lebih Lanjut (Development)
+Jika kamu ingin melakukan modifikasi kode dan ingin server melakukan muat ulang (*auto-restart*) secara otomatis setiap ada perubahan file, gunakan **Nodemon**:
 ```bash
-npm start
-```
-
-### Running with nodemon (auto-restart on changes)
-```bash
+# Instal nodemon secara global (juku belum punya)
 npm install -g nodemon
+
+# Jalankan aplikasi dengan nodemon
 nodemon index.js
+
+```
+## 🔒 Catatan Keamanan Produksi
+ * Pastikan untuk selalu mengubah nilai variabel JWT_SECRET pada file .env sebelum melakukan deployment ke server publik.
+ * Selalu gunakan protokol HTTPS pada server produksi demi mengamankan pengiriman token JWT dari sisi client ke server.
+ * Lakukan pembaruan dependensi berkala menggunakan npm update untuk menghindari celah keamanan (*vulnerability*).
 ```
 
-## Deployment
-
-### Deployment Options
-
-#### 1. VPS (Virtual Private Server)
-
-**Prerequisites:**
-- Ubuntu/Debian server
-- Node.js installed
-- MySQL installed
-- Nginx (optional, for reverse proxy)
-
-**Steps:**
-1. Clone the repository to your server
-2. Install dependencies: `npm install --production`
-3. Set up environment variables in `.env`
-4. Run the database schema
-5. Use PM2 to keep the application running:
-```bash
-npm install -g pm2
-pm2 start index.js --name "toko-online"
-pm2 save
-pm2 startup
 ```
-
-#### 2. Heroku
-
-**Prerequisites:**
-- Heroku CLI installed
-- Heroku account
-
-**Steps:**
-1. Login to Heroku: `heroku login`
-2. Create a new app: `heroku create your-app-name`
-3. Add MySQL add-on: `heroku addons:create cleardb`
-4. Set environment variables:
-```bash
-heroku config:set DB_HOST=your-db-host
-heroku config:set DB_USER=your-db-user
-heroku config:set DB_PASSWORD=your-db-password
-heroku config:set DB_NAME=your-db-name
-heroku config:set JWT_SECRET=your-jwt-secret
-```
-5. Deploy: `git push heroku main`
-
-#### 3. Vercel (Frontend only)
-
-For backend deployment, use VPS or Heroku. Vercel can be used to host the frontend separately.
-
-## Security Considerations
-
-- Change the default JWT_SECRET in production
-- Use strong passwords for database users
-- Enable HTTPS in production
-- Implement rate limiting for API endpoints
-- Validate and sanitize all user inputs
-- Keep dependencies updated
-
-## Troubleshooting
-
-### Database Connection Error
-- Ensure MySQL is running
-- Check database credentials in `.env`
-- Verify the database exists
-
-### File Upload Issues
-- Ensure the `uploads/` directory exists and has write permissions
-- Check Multer configuration in `src/middleware/upload.js`
-
-### Authentication Issues
-- Verify JWT_SECRET is set in `.env`
-- Check token expiration (default: 24 hours)
-
-## License
-
-MIT
-
-## Support
-
-For issues and questions, please open an issue on the repository.
