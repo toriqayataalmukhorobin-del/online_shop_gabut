@@ -1,4 +1,4 @@
-# 🛍️ API Toko Online (E-Commerce)
+# 🛍️ API Toko Online Sederhana (E-Commerce)
 
 <p align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=24&pause=1000&color=36BCF7&center=true&vCenter=true&width=700&lines=Aplikasi+E-Commerce+Full-Stack;Dibangun+dengan+Node.js+%26+Express;Sistem+Autentikasi+JWT+%26+Role+Access" alt="Typing SVG" />
